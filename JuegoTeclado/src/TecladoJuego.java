@@ -13,19 +13,30 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.Color;
 
 public class TecladoJuego {
 
 	private JFrame frame;
-	ArrayList<String> palabras = new ArrayList<>(Arrays.asList("elefante", "computadora", "restaurante", "mesabanco", "excepcional", "enciclopedia", "desarrollo", "aventura", "universidad", "extraordinario"));
+	ArrayList<String> palabras = new ArrayList<>(Arrays.asList("elefante", "computadora", "restaurante", "mesabanco", "excepcional", "enciclopedia", "desarrollo", "aventura", "universidad", "extraordinario","mariposa"));
 	ArrayList<JLabel> arrLetras;
 	JLabel lblPalabra;
 	JLabel lblInput;
 	JLabel lblSpace;
 	JLabel lblBackspace;
+	String palabra;
+	int randomAnterior=12;
+	Timer timer ;
+	long  tiempoEnMilisegundos = 0;
+    String tiempoFormateado;
+	
 	/**
 	 * Launch the application.
 	 */
@@ -55,6 +66,8 @@ public class TecladoJuego {
 	private void initialize() {
 		ArrayList<String> letras = new ArrayList<>(Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "Ñ", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"));
 		arrLetras= new ArrayList<>();
+		
+		
 
 		frame = new JFrame();
 		frame.setBounds(100, 100, 500, 400);
@@ -83,6 +96,20 @@ public class TecladoJuego {
 		lblTiempo.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		lblTiempo.setBounds(339, 11, 121, 33);
 		panelPalabras.add(lblTiempo);
+		
+		timer = new Timer();
+		tiempoEnMilisegundos = 0;
+		timer.scheduleAtFixedRate(new TimerTask() {
+			 public void run() {
+				 tiempoEnMilisegundos += 1; // Incrementar el tiempo en 100 milisegundos
+
+	                long segundos = tiempoEnMilisegundos / 1000; // Obtener los segundos
+	                long milisegundos = tiempoEnMilisegundos % 1000; // Obtener los milisegundos
+
+	                tiempoFormateado = String.format("%02d:%03d", segundos, milisegundos);
+	   	        lblTiempo.setText(tiempoFormateado);
+           }
+        }, 0, 1);
 		
 		JPanel panelTeclado = new JPanel();
 		panelTeclado.setBackground(new Color(255, 128, 128));
@@ -165,29 +192,6 @@ public class TecladoJuego {
 					}
 				}
 				
-				switch (code){
-				case KeyEvent.VK_DELETE:
-                   
-                    break;
-				case 87:
-				case 38:
-					
-					break;
-				case 65:
-				case 37:
-					
-					break;
-				case 83:
-				case 40:
-					
-					break;
-				case 68:
-				case 39:
-					
-					break;
-				}
-				
-				
 				
 				
 			}
@@ -199,15 +203,21 @@ public class TecladoJuego {
 				//char letra =e.getKeyChar();
 				String letraPresionada = e.getKeyText(code);
 				for (JLabel lblLetra : arrLetras) {
-					if(letraPresionada.equals(lblLetra.getText())) {
+					
 						lblLetra.setBackground(Color.white);
-					}
+					
 				}
 				if (code == 8 ) {
 					lblBackspace.setBackground(Color.white);
 					}
 				else if(code==32) {
 					lblSpace.setBackground(Color.white);
+				}
+				if(lblInput.getText().equals(palabra)) {
+					JOptionPane.showMessageDialog(null, "Tu tiempo fue de: " + tiempoFormateado, "Felicidades", 1, null);
+					palabraAzar();
+					lblInput.setText("");
+					tiempoEnMilisegundos=0;
 				}
 			}
 			
@@ -216,9 +226,16 @@ public class TecladoJuego {
 	}
 	
 	public void palabraAzar() {
+		
         Random random = new Random();
-        int indiceAleatorio = random.nextInt(palabras.size());
-        lblPalabra.setText(palabras.get(indiceAleatorio));
+        int indiceAleatorio;
+        do {
+        	 indiceAleatorio = random.nextInt(palabras.size());
+        	
+        }while(indiceAleatorio==randomAnterior);
+        randomAnterior=indiceAleatorio;
+        palabra=palabras.get(indiceAleatorio);
+        lblPalabra.setText(palabra);
     }
 	public Color colorAleatorio() {
 		Random rand= new Random();
